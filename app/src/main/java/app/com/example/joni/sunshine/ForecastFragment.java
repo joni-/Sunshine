@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class ForecastFragment extends Fragment {
 
-    private static String TAG = "ForecastFragment";
+    private final static String TAG = ForecastFragment.class.getSimpleName();
 
     private ListView forecastList;
 
@@ -46,7 +46,7 @@ public class ForecastFragment extends Fragment {
 
     private class GetAndShowWeatherDataTask extends AsyncTask {
 
-        private String TAG = "GetAndShowWeatherDataTask";
+        private final String TAG = GetAndShowWeatherDataTask.class.getSimpleName();
 
         private List<String> forecastData;
 
