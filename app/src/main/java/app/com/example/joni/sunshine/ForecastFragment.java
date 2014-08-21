@@ -42,11 +42,14 @@ public class ForecastFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         setHasOptionsMenu(true);
-
         forecastList = (ListView) rootView.findViewById(R.id.listview_forecast);
-        new GetAndShowWeatherDataTask().execute();
-
+        refreshWeatherData();
         return rootView;
+    }
+
+    private void refreshWeatherData() {
+        GetAndShowWeatherDataTask weatherDataTask = new GetAndShowWeatherDataTask();
+        weatherDataTask.execute();
     }
 
     @Override
@@ -58,7 +61,8 @@ public class ForecastFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.action_refresh) {
-            new GetAndShowWeatherDataTask().execute();
+            refreshWeatherData();
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }
