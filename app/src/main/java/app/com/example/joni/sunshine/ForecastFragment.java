@@ -1,5 +1,6 @@
 package app.com.example.joni.sunshine;
 
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -49,7 +50,7 @@ public class ForecastFragment extends Fragment {
 
     private void refreshWeatherData() {
         GetAndShowWeatherDataTask weatherDataTask = new GetAndShowWeatherDataTask();
-        weatherDataTask.execute();
+        weatherDataTask.execute("Joensuu");
     }
 
     @Override
@@ -67,25 +68,28 @@ public class ForecastFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private class GetAndShowWeatherDataTask extends AsyncTask {
+    private class GetAndShowWeatherDataTask extends AsyncTask<String, Void, Void> {
 
         private final String TAG = GetAndShowWeatherDataTask.class.getSimpleName();
 
         private List<String> forecastData;
 
+        private String city = "Joensuu";
+
         @Override
-        protected Object doInBackground(Object[] params) {
+        protected Void doInBackground(String... params) {
             Log.v(TAG, "Fetching forecast data");
+            if (params != null && params.length > 0) {
+                city = params[0];
+            }
             forecastData = getForecastData();
-            return forecastData;
+            return null;
         }
 
         @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
-
+        protected void onPostExecute(Void v) {
+            super.onPostExecute(v);
             Log.v(TAG, "Setting the adapter");
-
             ArrayAdapter adapter = new ArrayAdapter(getActivity(), R.layout.list_item_forecast,
                     R.id.list_item_forecast_textview, forecastData);
             forecastList.setAdapter(adapter);
@@ -103,13 +107,14 @@ public class ForecastFragment extends Fragment {
             String jsonResponse = null;
 
             try {
-                String link = "http://api.openweathermap.org/data/2.5/forecast/daily?q=Joensuu&mode=json&units=metric&cnt=7";
+                String link = UriHelper.getAPILinkByQuery(city);
 
                 URL url = new URL(link);
 
-                Log.i(TAG, String.format("Reading data from %s", link));
+                Log.v(TAG, String.format("Reading data from %s", link));
 
                 urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
 
                 InputStream inputStream = urlConnection.getInputStream();
@@ -125,6 +130,7 @@ public class ForecastFragment extends Fragment {
                 }
 
                 jsonResponse = buffer.toString();
+                Log.v(TAG, String.format("Response from %s: %s", new Object[] { link, jsonResponse }));
             } catch (IOException e) {
                 Log.e(TAG, "Error while reading data from Open Weather Map", e);
             } finally {
