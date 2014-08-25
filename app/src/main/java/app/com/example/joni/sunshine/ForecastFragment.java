@@ -74,36 +74,34 @@ public class ForecastFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private class GetAndShowWeatherDataTask extends AsyncTask<String, Void, Void> {
+    private class GetAndShowWeatherDataTask extends AsyncTask<String, String[], String[]> {
 
         private final String TAG = GetAndShowWeatherDataTask.class.getSimpleName();
-
-        private List<String> forecastData;
 
         private String city = "Joensuu";
 
         @Override
-        protected Void doInBackground(String... params) {
+        protected String[] doInBackground(String... params) {
             Log.v(TAG, "Fetching forecast data");
             if (params != null && params.length > 0) {
                 city = params[0];
             }
-            forecastData = getForecastData();
-            return null;
+            String[] forecastData = getForecastData();
+            return forecastData;
         }
 
         @Override
-        protected void onPostExecute(Void v) {
-            super.onPostExecute(v);
+        protected void onPostExecute(String[] forecastData) {
+            super.onPostExecute(forecastData);
             Log.v(TAG, "Setting the adapter");
             ArrayAdapter adapter = new ArrayAdapter(getActivity(), R.layout.list_item_forecast,
                     R.id.list_item_forecast_textview, forecastData);
             forecastList.setAdapter(adapter);
         }
 
-        private List<String> getForecastData() {
+        private String[] getForecastData() {
             String jsonForecast = readForecastData();
-            List<String> forecastData = parseForecastData(jsonForecast);
+            String[] forecastData = parseForecastData(jsonForecast);
             return forecastData;
         }
 
@@ -155,12 +153,12 @@ public class ForecastFragment extends Fragment {
             return jsonResponse;
         }
 
-        private List<String> parseForecastData(String jsonForecast) {
+        private String[] parseForecastData(String jsonForecast) {
             try {
-                return new ArrayList<String>(Arrays.asList(getWeatherDataFromJson(jsonForecast, 7)));
+                return getWeatherDataFromJson(jsonForecast, 7);
             } catch (JSONException e) {
                 Log.e(TAG, "Error while parsing weather json.", e);
-                return new ArrayList<String>();
+                return new String[0];
             }
         }
 
