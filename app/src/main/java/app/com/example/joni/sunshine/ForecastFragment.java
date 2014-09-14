@@ -40,6 +40,7 @@ public class ForecastFragment extends Fragment {
     private final static String TAG = ForecastFragment.class.getSimpleName();
 
     private ListView forecastList;
+    private ArrayAdapter<String> forecastAdapter;
 
     public ForecastFragment() {
     }
@@ -50,6 +51,9 @@ public class ForecastFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         setHasOptionsMenu(true);
         forecastList = (ListView) rootView.findViewById(R.id.listview_forecast);
+        forecastAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast,
+                R.id.list_item_forecast_textview);
+        forecastList.setAdapter(forecastAdapter);
         refreshWeatherData();
         return rootView;
     }
@@ -93,10 +97,10 @@ public class ForecastFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] forecastData) {
             super.onPostExecute(forecastData);
-            Log.v(TAG, "Setting the adapter");
-            ArrayAdapter adapter = new ArrayAdapter(getActivity(), R.layout.list_item_forecast,
-                    R.id.list_item_forecast_textview, forecastData);
-            forecastList.setAdapter(adapter);
+            forecastAdapter.clear();
+            for (String data : forecastData) {
+                forecastAdapter.add(data);
+            }
         }
 
         private String[] getForecastData() {
