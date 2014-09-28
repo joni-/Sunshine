@@ -4,11 +4,9 @@
     android:layout_width="match_parent" android:layout_height="match_parent"
     android:text="@string/forecast_dummy_text"
     android:id="@+id/list_item_forecast_textview"
-    android:textColor="@android:color/darker_gray"
-    android:textIsSelectable="true"
-    android:textSize="@dimen/sunshine_list_text_size"
-    android:gravity="center_horizontal"
-    android:paddingTop="15dp"
-    android:paddingBottom="15dp">
+    android:textSize="24sp"
+    android:textColor="#ff919191"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp">
 
 </TextView>
