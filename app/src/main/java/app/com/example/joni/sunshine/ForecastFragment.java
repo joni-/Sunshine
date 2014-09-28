@@ -1,5 +1,6 @@
 package app.com.example.joni.sunshine;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -13,8 +14,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,6 +40,8 @@ import java.util.List;
  */
 public class ForecastFragment extends Fragment {
 
+    final static String SELECTED_FORECAST_KEY = "selected_forecast";
+
     private final static String TAG = ForecastFragment.class.getSimpleName();
 
     private ListView forecastList;
@@ -54,6 +59,19 @@ public class ForecastFragment extends Fragment {
         forecastAdapter = new ArrayAdapter<String>(getActivity(), R.layout.list_item_forecast,
                 R.id.list_item_forecast_textview);
         forecastList.setAdapter(forecastAdapter);
+
+        forecastList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String selectedForecast = (String) adapterView.getItemAtPosition(i);
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString(ForecastFragment.SELECTED_FORECAST_KEY, selectedForecast);
+                intent.putExtras(bundle);
+                startActivity(intent);
+            }
+        });
+
         refreshWeatherData();
         return rootView;
     }
