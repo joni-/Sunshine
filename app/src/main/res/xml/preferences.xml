@@ -3,7 +3,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <EditTextPreference
-        android:key="pref_city"
+        android:key="@string/pref_city_key"
         android:title="@string/pref_city"
         android:summary="@string/pref_city_summary"
         android:defaultValue="@string/pref_city_default"
@@ -11,7 +11,7 @@
     </EditTextPreference>
 
     <ListPreference
-        android:key="pref_units"
+        android:key="@string/pref_units_key"
         android:entries="@array/pref_units_human"
         android:entryValues="@array/pref_units_values"
         android:title="@string/pref_units"

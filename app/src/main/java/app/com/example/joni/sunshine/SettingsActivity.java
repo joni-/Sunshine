@@ -27,9 +27,10 @@ public class SettingsActivity extends PreferenceActivity
 
         // For all preferences, attach an OnPreferenceChangeListener so the UI summary can be
         // updated when the preference changes.
-        // TODO: Add preferences
-        bindPreferenceSummaryToValue(getPreferenceManager().findPreference("pref_city"));
-        bindPreferenceSummaryToValue(getPreferenceManager().findPreference("pref_units"));
+        bindPreferenceSummaryToValue(getPreferenceManager()
+                .findPreference(getString(R.string.pref_city_key)));
+        bindPreferenceSummaryToValue(getPreferenceManager()
+                .findPreference(getString(R.string.pref_units_key)));
     }
 
     /**
