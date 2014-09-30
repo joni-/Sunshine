@@ -1,5 +1,6 @@
 package app.com.example.joni.sunshine;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -15,12 +16,9 @@ import android.widget.TextView;
 
 public class DetailActivity extends ActionBarActivity {
 
-    private Bundle extras;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        extras = getIntent().getExtras();
         setContentView(R.layout.activity_detail);
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
@@ -44,6 +42,7 @@ public class DetailActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            startActivity(new Intent(this, SettingsActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -52,7 +51,7 @@ public class DetailActivity extends ActionBarActivity {
     /**
      * A placeholder fragment containing a simple view.
      */
-    public class PlaceholderFragment extends Fragment {
+    public static class PlaceholderFragment extends Fragment {
 
         public PlaceholderFragment() {
         }
@@ -62,6 +61,8 @@ public class DetailActivity extends ActionBarActivity {
                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
             TextView forecast = (TextView) rootView.findViewById(R.id.selected_forecast_text);
+            Intent intent = getActivity().getIntent();
+            Bundle extras = intent.getExtras();
             if (extras != null) {
                 String selectedForecastText = extras.getString(ForecastFragment.SELECTED_FORECAST_KEY);
                 forecast.setText(selectedForecastText);

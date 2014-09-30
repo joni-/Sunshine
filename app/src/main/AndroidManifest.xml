@@ -26,6 +26,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="app.com.example.joni.sunshine.MainActivity" />
         </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:value="SettingsActivity">
+        </activity>
     </application>
 
 </manifest>
