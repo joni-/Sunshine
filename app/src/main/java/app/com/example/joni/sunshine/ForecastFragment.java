@@ -1,10 +1,12 @@
 package app.com.example.joni.sunshine;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -77,8 +79,12 @@ public class ForecastFragment extends Fragment {
     }
 
     private void refreshWeatherData() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        String selectedCity = prefs.getString(
+                getString(R.string.pref_city_key),
+                getString(R.string.pref_city_default));
         GetAndShowWeatherDataTask weatherDataTask = new GetAndShowWeatherDataTask();
-        weatherDataTask.execute("Joensuu");
+        weatherDataTask.execute(selectedCity);
     }
 
     @Override
