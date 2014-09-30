@@ -1,8 +1,11 @@
 package app.com.example.joni.sunshine;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.StrictMode;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -55,6 +58,16 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
+            return true;
+        } else if (id == R.id.action_show_on_map) {
+            SharedPreferences prefs = PreferenceManager
+                    .getDefaultSharedPreferences(getApplicationContext());
+            String city = prefs.getString(
+                    getString(R.string.pref_city_key),
+                    getString(R.string.pref_city_default));
+            String geolocation = "geo:0,0?q=" + city;
+            Uri uri = Uri.parse(geolocation);
+            startActivity(new Intent(Intent.ACTION_VIEW).setData(uri));
             return true;
         }
         return super.onOptionsItemSelected(item);
