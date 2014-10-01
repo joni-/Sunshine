@@ -8,6 +8,7 @@
     <string name="refresh">Refresh</string>
     <string name="title_activity_detail">DetailActivity</string>
     <string name="action_show_on_map">Show on map</string>
+    <string name="no_apps_found_for_showing_on_map">No applications were found for displaying location on the map.</string>
 
     <string name="pref_city">City</string>
     <string name="pref_city_key">pref_city</string>

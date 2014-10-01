@@ -2,6 +2,8 @@ package app.com.example.joni.sunshine;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.StrictMode;
@@ -17,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -67,7 +70,24 @@ public class MainActivity extends ActionBarActivity {
                     getString(R.string.pref_city_default));
             String geolocation = "geo:0,0?q=" + city;
             Uri uri = Uri.parse(geolocation);
-            startActivity(new Intent(Intent.ACTION_VIEW).setData(uri));
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(uri);
+
+            // Get all activities we can use to display geodata
+            List<ResolveInfo> activities = getApplicationContext()
+                    .getPackageManager()
+                    .queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+
+            // Start the intent only if there are apps that can display it
+            if (activities.size() > 0) {
+                startActivity(intent);
+            } else {
+                Toast.makeText(getApplicationContext(),
+                        getString(R.string.no_apps_found_for_showing_on_map),
+                        Toast.LENGTH_SHORT).show();
+            }
+
             return true;
         }
         return super.onOptionsItemSelected(item);
