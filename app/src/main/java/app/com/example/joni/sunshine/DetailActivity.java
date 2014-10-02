@@ -1,16 +1,17 @@
 package app.com.example.joni.sunshine;
 
 import android.content.Intent;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
 import android.widget.TextView;
 
 
@@ -26,7 +27,6 @@ public class DetailActivity extends ActionBarActivity {
                     .commit();
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -53,7 +53,41 @@ public class DetailActivity extends ActionBarActivity {
      */
     public static class PlaceholderFragment extends Fragment {
 
+        private static final String HASHTAG = "#SunshineApp";
+
+        private ShareActionProvider shareActionProvider;
+        private String forecastData;
+
         public PlaceholderFragment() {
+            setHasOptionsMenu(true);
+        }
+
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            inflater.inflate(R.menu.detailfragment, menu);
+            MenuItem item = menu.findItem(R.id.detail_menu_share);
+            shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+            if (shareActionProvider != null) {
+                shareActionProvider.setShareIntent(createForecastShareIntent());
+            }
+        }
+
+        private Intent createForecastShareIntent() {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, forecastData + " " + HASHTAG);
+            return shareIntent;
+        }
+
+        private void setShareIntent() {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, "#Sunshine");
+
+            if (shareActionProvider != null) {
+                shareActionProvider.setShareIntent(shareIntent);
+            }
         }
 
         @Override
@@ -64,8 +98,8 @@ public class DetailActivity extends ActionBarActivity {
             Intent intent = getActivity().getIntent();
             Bundle extras = intent.getExtras();
             if (extras != null) {
-                String selectedForecastText = extras.getString(ForecastFragment.SELECTED_FORECAST_KEY);
-                forecast.setText(selectedForecastText);
+                forecastData = extras.getString(ForecastFragment.SELECTED_FORECAST_KEY);
+                forecast.setText(forecastData);
             }
             return rootView;
         }

@@ -19,4 +19,6 @@
     <string name="pref_units_key">pref_units</string>
     <string name="pref_units_summary">Select the unit in which temperatures are shown</string>
     <string name="pref_units_default">metric</string>
+
+    <string name="menu_share">Share</string>
 </resources>
