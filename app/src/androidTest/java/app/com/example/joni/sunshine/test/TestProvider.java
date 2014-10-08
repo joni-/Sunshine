@@ -1,9 +1,11 @@
 package app.com.example.joni.sunshine.test;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
+import android.net.Uri;
 import android.test.AndroidTestCase;
 
 import app.com.example.joni.sunshine.data.WeatherContract;
@@ -42,11 +44,8 @@ public class TestProvider extends AndroidTestCase {
     }
 
     public void testInsertReadProvider() throws Throwable {
-        WeatherDbHelper dbHelper = new WeatherDbHelper(this.mContext);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
         ContentValues locationValues = getLocationValues();
-        db.insert(LocationEntry.TABLE_NAME, null, locationValues);
+        mContext.getContentResolver().insert(LocationEntry.CONTENT_URI, locationValues);
 
         Cursor locationCursor = mContext.getContentResolver().query(
                 LocationEntry.CONTENT_URI,
@@ -58,7 +57,8 @@ public class TestProvider extends AndroidTestCase {
 
         int locationRowId = locationCursor.getInt(locationCursor.getColumnIndex(LocationEntry._ID));
         ContentValues weatherValues = getWeatherData(locationRowId);
-        db.insert(WeatherEntry.TABLE_NAME, null, weatherValues);
+        Uri weatherUri = mContext.getContentResolver()
+                .insert(WeatherEntry.CONTENT_URI, weatherValues);
 
         Cursor weatherCursor = mContext.getContentResolver().query(
                 WeatherEntry.CONTENT_URI,
@@ -96,7 +96,8 @@ public class TestProvider extends AndroidTestCase {
         );
         validateCursor(weatherCursor, weatherValues);
 
-        dbHelper.close();
+        locationCursor.close();
+        weatherCursor.close();
     }
 
     /**
