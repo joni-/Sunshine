@@ -222,7 +222,27 @@ public class WeatherProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+        int rowsDeleted = 0;
+        switch (uriMatcher.match(uri)) {
+            case WEATHER:
+                rowsDeleted = mOpenHelper.getWritableDatabase().delete(
+                        WeatherContract.WeatherEntry.TABLE_NAME,
+                        selection,
+                        selectionArgs
+                );
+                break;
+            case LOCATION:
+                rowsDeleted = mOpenHelper.getWritableDatabase().delete(
+                        WeatherContract.LocationEntry.TABLE_NAME,
+                        selection,
+                        selectionArgs
+                );
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        getContext().getContentResolver().notifyChange(uri, null);
+        return rowsDeleted;
     }
 
     @Override

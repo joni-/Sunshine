@@ -43,6 +43,34 @@ public class TestProvider extends AndroidTestCase {
         assertEquals(LocationEntry.CONTENT_ITEM_TYPE, type);
     }
 
+    public void testDeleteLocationProvider() {
+        ContentValues locationValues = getLocationValues();
+        Uri uri = mContext.getContentResolver().insert(LocationEntry.CONTENT_URI, locationValues);
+        long locationId = ContentUris.parseId(uri);
+
+        // Delete the inserted record
+        int rowsDeleted = mContext.getContentResolver().delete(
+                LocationEntry.CONTENT_URI, LocationEntry._ID + " = ? ",
+                new String[] { String.valueOf(locationId) });
+        assertEquals(1, rowsDeleted);
+    }
+
+    public void testDeleteWeatherProvider() {
+        ContentValues locationValues = getLocationValues();
+        Uri locationUri = mContext.getContentResolver().insert(LocationEntry.CONTENT_URI, locationValues);
+        long locationId = ContentUris.parseId(locationUri);
+
+        ContentValues weatherValues = getWeatherData(locationId);
+        Uri weatherUri = mContext.getContentResolver().insert(WeatherEntry.CONTENT_URI, weatherValues);
+        long weatherId = ContentUris.parseId(weatherUri);
+
+        int rowsDeleted = mContext.getContentResolver().delete(
+                WeatherEntry.CONTENT_URI, WeatherEntry._ID + " = ? ",
+                new String[] { String.valueOf(weatherId) }
+        );
+        assertEquals(1, rowsDeleted);
+    }
+
     public void testInsertReadProvider() throws Throwable {
         ContentValues locationValues = getLocationValues();
         mContext.getContentResolver().insert(LocationEntry.CONTENT_URI, locationValues);
@@ -143,7 +171,7 @@ public class TestProvider extends AndroidTestCase {
         return locationValues;
     }
 
-    private ContentValues getWeatherData(int locationRowId) {
+    private ContentValues getWeatherData(long locationRowId) {
         ContentValues weatherValues = new ContentValues();
         weatherValues.put(WeatherEntry.COLUMN_LOCATION_KEY, locationRowId);
         weatherValues.put(WeatherEntry.COLUMN_DATE_TEXT, TEST_DATE);
