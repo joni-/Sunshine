@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.location.Location;
 import android.test.AndroidTestCase;
 
+import app.com.example.joni.sunshine.data.WeatherContract;
 import app.com.example.joni.sunshine.data.WeatherContract.LocationEntry;
 import app.com.example.joni.sunshine.data.WeatherContract.WeatherEntry;
 import app.com.example.joni.sunshine.data.WeatherDbHelper;
@@ -14,6 +15,10 @@ import app.com.example.joni.sunshine.data.WeatherDbHelper;
  * Created by joni.nevalainen on 4.10.2014.
  */
 public class TestProvider extends AndroidTestCase {
+
+    private static final String TEST_CITY = "Joensuu";
+    private static final String TEST_DATE = "20141008";
+
     public void testDeleteDb() throws Throwable {
         mContext.deleteDatabase(WeatherDbHelper.DATABASE_NAME);
     }
@@ -22,13 +27,11 @@ public class TestProvider extends AndroidTestCase {
         String type = mContext.getContentResolver().getType(WeatherEntry.CONTENT_URI);
         assertEquals(WeatherEntry.CONTENT_TYPE, type);
 
-        String testLocation = "Joensuu";
-        type = mContext.getContentResolver().getType(WeatherEntry.buildWeatherLocation(testLocation));
+        type = mContext.getContentResolver().getType(WeatherEntry.buildWeatherLocation(TEST_CITY));
         assertEquals(WeatherEntry.CONTENT_TYPE, type);
 
-        String testDate = "20141007";
         type = mContext.getContentResolver().getType(
-                WeatherEntry.buildWeatherLocationWithDate(testLocation, testDate));
+                WeatherEntry.buildWeatherLocationWithDate(TEST_CITY, TEST_DATE));
         assertEquals(WeatherEntry.CONTENT_ITEM_TYPE, type);
 
         type = mContext.getContentResolver().getType(LocationEntry.CONTENT_URI);
@@ -38,21 +41,59 @@ public class TestProvider extends AndroidTestCase {
         assertEquals(LocationEntry.CONTENT_ITEM_TYPE, type);
     }
 
-    public void testInsertReadDb() throws Throwable {
+    public void testInsertReadProvider() throws Throwable {
         WeatherDbHelper dbHelper = new WeatherDbHelper(this.mContext);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues locationValues = getLocationValues();
         db.insert(LocationEntry.TABLE_NAME, null, locationValues);
 
-        Cursor locationCursor = db.rawQuery("SELECT * FROM " + LocationEntry.TABLE_NAME, null);
+        Cursor locationCursor = mContext.getContentResolver().query(
+                LocationEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null);
         validateCursor(locationCursor, locationValues);
 
         int locationRowId = locationCursor.getInt(locationCursor.getColumnIndex(LocationEntry._ID));
         ContentValues weatherValues = getWeatherData(locationRowId);
         db.insert(WeatherEntry.TABLE_NAME, null, weatherValues);
 
-        Cursor weatherCursor = db.rawQuery("SELECT * FROM " + WeatherEntry.TABLE_NAME, null);
+        Cursor weatherCursor = mContext.getContentResolver().query(
+                WeatherEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null);
+        validateCursor(weatherCursor, weatherValues);
+
+        locationCursor = mContext.getContentResolver().query(
+                LocationEntry.buildLocationUri(locationRowId),
+                null,
+                null,
+                null,
+                null
+        );
+        locationValues.put(LocationEntry._ID, locationRowId);
+        validateCursor(locationCursor, locationValues);
+
+        weatherCursor = mContext.getContentResolver().query(
+                WeatherContract.WeatherEntry.buildWeatherLocation(TEST_CITY),
+                null,
+                null,
+                null,
+                null
+        );
+        validateCursor(weatherCursor, weatherValues);
+
+        weatherCursor = mContext.getContentResolver().query(
+                WeatherContract.WeatherEntry.buildWeatherLocationWithDate(TEST_CITY, TEST_DATE),
+                null,
+                null,
+                null,
+                null
+        );
         validateCursor(weatherCursor, weatherValues);
 
         dbHelper.close();
@@ -94,8 +135,8 @@ public class TestProvider extends AndroidTestCase {
 
     private ContentValues getLocationValues() {
         ContentValues locationValues = new ContentValues();
-        locationValues.put(LocationEntry.COLUMN_CITY, "Joensuu");
-        locationValues.put(LocationEntry.COLUMN_LOCATION_SETTING, "Dummy");
+        locationValues.put(LocationEntry.COLUMN_CITY, TEST_CITY);
+        locationValues.put(LocationEntry.COLUMN_LOCATION_SETTING, TEST_CITY);
         locationValues.put(LocationEntry.COLUMN_LON, 62.25);
         locationValues.put(LocationEntry.COLUMN_LAT, 29.24);
         return locationValues;
@@ -104,7 +145,7 @@ public class TestProvider extends AndroidTestCase {
     private ContentValues getWeatherData(int locationRowId) {
         ContentValues weatherValues = new ContentValues();
         weatherValues.put(WeatherEntry.COLUMN_LOCATION_KEY, locationRowId);
-        weatherValues.put(WeatherEntry.COLUMN_DATE_TEXT, "20141205");
+        weatherValues.put(WeatherEntry.COLUMN_DATE_TEXT, TEST_DATE);
         weatherValues.put(WeatherEntry.COLUMN_DEGREES, 1.1);
         weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, 1.2);
         weatherValues.put(WeatherEntry.COLUMN_PRESSURE, 1.3);
