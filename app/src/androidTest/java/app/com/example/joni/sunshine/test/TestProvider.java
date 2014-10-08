@@ -19,7 +19,9 @@ import app.com.example.joni.sunshine.data.WeatherDbHelper;
 public class TestProvider extends AndroidTestCase {
 
     private static final String TEST_CITY = "Joensuu";
+    private static final String TEST_CITY_UPDATE = "Helsinki";
     private static final String TEST_DATE = "20141008";
+    private static final String TEST_DATE_UPDATE = "20151112";
 
     public void testDeleteDb() throws Throwable {
         mContext.deleteDatabase(WeatherDbHelper.DATABASE_NAME);
@@ -69,6 +71,64 @@ public class TestProvider extends AndroidTestCase {
                 new String[] { String.valueOf(weatherId) }
         );
         assertEquals(1, rowsDeleted);
+    }
+
+    public void testUpdateLocationProvider() {
+        ContentValues locationValues = getLocationValues();
+        Uri uri = mContext.getContentResolver().insert(LocationEntry.CONTENT_URI, locationValues);
+        long locationId = ContentUris.parseId(uri);
+
+        // Update the inserted record
+        locationValues.put(LocationEntry.COLUMN_CITY, TEST_CITY_UPDATE);
+        int rowsUpdated = mContext.getContentResolver().update(
+                LocationEntry.CONTENT_URI,
+                locationValues,
+                LocationEntry._ID + " = ? ",
+                new String[] { String.valueOf(locationId) }
+        );
+        assertEquals(1, rowsUpdated);
+
+        // Validate that values match
+        Cursor locationCursor = mContext.getContentResolver().query(
+                LocationEntry.buildLocationUri(locationId),
+                null,
+                null,
+                null,
+                null
+        );
+        validateCursor(locationCursor, locationValues);
+        locationCursor.close();
+    }
+
+    public void testUpdateWeatherProvider() {
+        ContentValues locationValues = getLocationValues();
+        Uri locationUri = mContext.getContentResolver().insert(LocationEntry.CONTENT_URI, locationValues);
+        long locationId = ContentUris.parseId(locationUri);
+
+        ContentValues weatherValues = getWeatherData(locationId);
+        Uri weatherUri = mContext.getContentResolver().insert(WeatherEntry.CONTENT_URI, weatherValues);
+        long weatherId = ContentUris.parseId(weatherUri);
+
+        // Update weather values
+        weatherValues.put(WeatherEntry.COLUMN_DATE_TEXT, TEST_DATE_UPDATE);
+        int rowsUpdated = mContext.getContentResolver().update(
+                WeatherEntry.CONTENT_URI,
+                weatherValues,
+                WeatherEntry._ID + " = ? ",
+                new String[] { String.valueOf(weatherId) }
+        );
+        assertEquals(1, rowsUpdated);
+
+        // Check that the updated data is correct
+        Cursor weatherCursor = mContext.getContentResolver().query(
+                WeatherEntry.CONTENT_URI,
+                null,
+                WeatherEntry._ID + " = ? ",
+                new String[] { String.valueOf(weatherId) },
+                null
+        );
+        validateCursor(weatherCursor, weatherValues);
+        weatherCursor.close();
     }
 
     public void testInsertReadProvider() throws Throwable {
