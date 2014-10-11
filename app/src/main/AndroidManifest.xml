@@ -28,7 +28,11 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:value="SettingsActivity">
+            android:value="SettingsActivity"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="app.com.example.joni.sunshine.MainActivity" />
         </activity>
         <provider
             android:authorities="com.example.joni.sunshine.app"

@@ -184,6 +184,14 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         getLoaderManager().initLoader(FORECAST_LOADER, null, this);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mLocation != null && !Utility.getPreferredLocation(getActivity()).equals(mLocation)) {
+            getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
+        }
+    }
+
     private void refreshWeatherData() {
         FetchWeatherTask weatherDataTask = new FetchWeatherTask(getActivity());
         weatherDataTask.execute(Utility.getPreferredLocation(getActivity()));
