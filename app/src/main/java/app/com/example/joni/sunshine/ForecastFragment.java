@@ -164,12 +164,10 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                             "%s - %s - %s/%s", date, forecast, high, low);
 
                     // Open detail view
-                    Intent intent = new Intent(getActivity(), DetailActivity.class);
-                    Bundle bundle = new Bundle();
-                    bundle.putString(ForecastFragment.SELECTED_FORECAST_KEY, forecastString);
-                    intent.putExtras(bundle);
-                    startActivity(intent);
-
+                    String dateString = cursor.getString(COL_WEATHER_DATE);
+                    Intent i = new Intent(getActivity(), DetailActivity.class)
+                            .putExtra(Intent.EXTRA_TEXT, dateString);
+                    startActivity(i);
                 }
             }
         });
