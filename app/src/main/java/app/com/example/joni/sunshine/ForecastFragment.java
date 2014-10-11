@@ -210,7 +210,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         String sortOrder = WeatherEntry.COLUMN_DATE_TEXT + " ASC";
         mLocation = Utility.getPreferredLocation(getActivity());
         Uri weatherLocationUri = WeatherEntry.buildWeatherLocationWithStartDate(mLocation, startDate);
-        Log.v(TAG, "Loading data from " + weatherLocationUri);
         return new CursorLoader(
                 getActivity(),
                 weatherLocationUri,

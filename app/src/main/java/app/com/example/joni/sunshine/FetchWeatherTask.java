@@ -47,7 +47,6 @@ public class FetchWeatherTask extends AsyncTask<String, String[], String[]> {
 
     @Override
     protected String[] doInBackground(String... params) {
-        Log.v(TAG, "Fetching forecast data");
         if (params == null || params.length == 0) {
             return null;
         }
@@ -72,8 +71,6 @@ public class FetchWeatherTask extends AsyncTask<String, String[], String[]> {
 
             URL url = new URL(link);
 
-            Log.v(TAG, String.format("Reading data from %s", link));
-
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
@@ -91,7 +88,6 @@ public class FetchWeatherTask extends AsyncTask<String, String[], String[]> {
             }
 
             jsonResponse = buffer.toString();
-            Log.v(TAG, String.format("Response from %s: %s", new Object[]{link, jsonResponse}));
         } catch (IOException e) {
             Log.e(TAG, "Error while reading data from Open Weather Map", e);
         } finally {
@@ -185,7 +181,6 @@ public class FetchWeatherTask extends AsyncTask<String, String[], String[]> {
         double lat = coordJSON.getDouble(OWM_COORD_LAT);
         double lon = coordJSON.getDouble(OWM_COORD_LON);
 
-        Log.v(TAG, cityName + ", lat: " + lat + " lon: " + lon);
         long locationId = addlocation(locationQuery, cityName, lat, lon);
 
         Vector<ContentValues> cVVector = new Vector<ContentValues>(numDays);
@@ -268,17 +263,14 @@ public class FetchWeatherTask extends AsyncTask<String, String[], String[]> {
 
     private void addWeatherValues(Vector<ContentValues> cVVector) {
         if (cVVector.size() > 0) {
-            Log.v(TAG, "Inserting " + cVVector.size() + " weather entries");
             int rowsInserted = mContext.getContentResolver().bulkInsert(
                     WeatherEntry.CONTENT_URI,
                     cVVector.toArray(new ContentValues[cVVector.size()])
             );
-            Log.v(TAG, "Finished inserting " + rowsInserted + " entries to database");
         }
     }
 
     private long addlocation(String locationSetting, String cityName, double lat, double lon) {
-        Log.v(TAG, "Inserting location " + locationSetting + " to database.");
         Cursor cursor = mContext.getContentResolver().query(
                 LocationEntry.CONTENT_URI,
                 null,
@@ -288,12 +280,10 @@ public class FetchWeatherTask extends AsyncTask<String, String[], String[]> {
         );
         long id;
         if (cursor.getCount() != 0) {
-            Log.v(TAG, "Location was already in the database.");
             cursor.moveToFirst();
             int index = cursor.getColumnIndex(LocationEntry._ID);
             id = cursor.getLong(index);
         } else {
-            Log.v(TAG, "Location do not exist in the database, doing the insertion.");
             ContentValues values = new ContentValues();
             values.put(LocationEntry.COLUMN_LOCATION_SETTING, locationSetting);
             values.put(LocationEntry.COLUMN_CITY, cityName);
