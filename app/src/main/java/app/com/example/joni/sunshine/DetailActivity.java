@@ -93,8 +93,8 @@ public class DetailActivity extends ActionBarActivity {
         private static final String HASHTAG = "#SunshineApp";
 
         private ShareActionProvider shareActionProvider;
-        private String forecastData;
         private String mDateString;
+        private String mShareText;
 
         public PlaceholderFragment() {
             setHasOptionsMenu(true);
@@ -111,39 +111,23 @@ public class DetailActivity extends ActionBarActivity {
             inflater.inflate(R.menu.detailfragment, menu);
             MenuItem item = menu.findItem(R.id.detail_menu_share);
             shareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
-            if (shareActionProvider != null) {
-                shareActionProvider.setShareIntent(createForecastShareIntent());
-            }
         }
 
         private Intent createForecastShareIntent() {
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
             shareIntent.setType("text/plain");
-            shareIntent.putExtra(Intent.EXTRA_TEXT, forecastData + " " + HASHTAG);
+            shareIntent.putExtra(Intent.EXTRA_TEXT, mShareText + " " + HASHTAG);
             return shareIntent;
-        }
-
-        private void setShareIntent() {
-            Intent shareIntent = new Intent(Intent.ACTION_SEND);
-            shareIntent.setType("text/plain");
-            shareIntent.putExtra(Intent.EXTRA_TEXT, "#Sunshine");
-
-            if (shareActionProvider != null) {
-                shareActionProvider.setShareIntent(shareIntent);
-            }
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-            TextView forecast = (TextView) rootView.findViewById(R.id.selected_forecast_text);
             Intent intent = getActivity().getIntent();
             Bundle extras = intent.getExtras();
             if (extras != null) {
-                forecastData = extras.getString(Intent.EXTRA_TEXT);
-                forecast.setText(forecastData);
                 mDateString = extras.getString(Intent.EXTRA_TEXT);
             }
             return rootView;
@@ -171,9 +155,19 @@ public class DetailActivity extends ActionBarActivity {
                         cursor.getDouble(COL_WEATHER_MIN_TEMP), isMetric);
 
                 // set data
-                String text = String.format("%s - %s - %s/%s", dateString, forecast, high, low);
-                ((TextView)getActivity().findViewById(R.id.selected_forecast_text))
-                        .setText(text);
+                ((TextView)getActivity().findViewById(R.id.forecaset_date_textview))
+                        .setText(Utility.formatDate(dateString));
+                ((TextView)getActivity().findViewById(R.id.forecast_description_textview))
+                        .setText(forecast);
+                ((TextView)getActivity().findViewById(R.id.forecast_high_textview))
+                        .setText(high);
+                ((TextView)getActivity().findViewById(R.id.forecast_low_textview))
+                        .setText(low);
+
+                mShareText = String.format("%s - %s - %s/%s", dateString, forecast, high, low);
+                if (shareActionProvider != null) {
+                    shareActionProvider.setShareIntent(createForecastShareIntent());
+                }
             }
         }
 
