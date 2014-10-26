@@ -13,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -87,7 +88,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private final static String TAG = ForecastFragment.class.getSimpleName();
 
     private ListView forecastList;
-    private SimpleCursorAdapter forecastAdapter;
+    private CursorAdapter forecastAdapter;
 
     public ForecastFragment() {
     }
@@ -99,57 +100,24 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         setHasOptionsMenu(true);
         forecastList = (ListView) rootView.findViewById(R.id.listview_forecast);
 
-        forecastAdapter = new SimpleCursorAdapter(
-                getActivity(),
-                R.layout.list_item_forecast,
-                null,
-                new String[] {
-                        WeatherEntry.COLUMN_DATE_TEXT,
-                        WeatherEntry.COLUMN_SHORT_DESC,
-                        WeatherEntry.COLUMN_TEMP_MAX,
-                        WeatherEntry.COLUMN_TEMP_MIN
-                },
-                new int[] {
-                        R.id.list_item_date_textview,
-                        R.id.list_item_forecast_textview,
-                        R.id.list_item_high_textview,
-                        R.id.list_item_low_textview
-                },
-                0
-        );
-        forecastList.setAdapter(forecastAdapter);
+        Uri uri = WeatherEntry.buildWeatherLocationWithStartDate(
+                Utility.getPreferredLocation(getActivity()),
+                WeatherContract.getDbDateString(new Date()));
 
-        forecastAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-            @Override
-            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-                boolean isMetric = Utility.isMetric(getActivity());
-                switch (columnIndex) {
-                    case COL_WEATHER_MAX_TEMP: {
-                        ((TextView)view).setText(Utility.formatTemperature(
-                                cursor.getDouble(columnIndex), isMetric
-                        ));
-                        return true;
-                    }
-                    case COL_WEATHER_MIN_TEMP: {
-                        Utility.formatTemperature(cursor.getDouble(columnIndex), isMetric);
-                        ((TextView)view).setText(Utility.formatTemperature(
-                                cursor.getDouble(columnIndex), isMetric));
-                        return true;
-                    }
-                    case COL_WEATHER_DATE: {
-                        String dateString = cursor.getString(columnIndex);
-                        ((TextView)view).setText(Utility.formatDate(dateString));
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
+        Cursor forecastCursor = getActivity().getContentResolver().query(
+                uri,
+                FORECAST_COLUMNS,
+                null,
+                null,
+                null);
+
+        forecastAdapter = new ForecastAdapter(getActivity(), forecastCursor, 0);
+        forecastList.setAdapter(forecastAdapter);
 
         forecastList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                SimpleCursorAdapter adapter = (SimpleCursorAdapter) adapterView.getAdapter();
+                CursorAdapter adapter = (CursorAdapter) adapterView.getAdapter();
                 Cursor cursor = adapter.getCursor();
                 if (cursor != null && cursor.moveToPosition(position)) {
                     // Construct string for detail view
