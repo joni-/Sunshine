@@ -21,4 +21,7 @@
     <string name="pref_units_default">metric</string>
 
     <string name="menu_share">Share</string>
+
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
 </resources>

@@ -32,7 +32,7 @@ public class ForecastAdapter extends CursorAdapter {
         // Date
         String dateString = cursor.getString(ForecastFragment.COL_WEATHER_DATE);
         TextView dateView = (TextView) view.findViewById(R.id.list_item_date_textview);
-        dateView.setText(dateString);
+        dateView.setText(Utility.getFriendlyDayString(context, dateString));
 
         // Description
         String description = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
